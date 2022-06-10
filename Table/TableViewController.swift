@@ -1,14 +1,8 @@
-//
-//  TableViewController.swift
-//  Table
-//
-//  Created by 203a22 on 2022/05/13.
-//
-
+*table view controller*
 import UIKit
-
-var items = ["책 구매","철수와 약속","스터디 준비하기"]
-var itemsImageFile = ["cart png.png","clock.png","pencil.png"]
+//앱 시작 시 기본적으로 나타낼 목록
+var items = ["책 구매", "철수와 약속", "스터디 준비하기"]
+var itemsImageFile = ["cart.png", "clock.png", "pencil.png"]
 
 class TableViewController: UITableViewController {
 
@@ -21,32 +15,33 @@ class TableViewController: UITableViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         self.navigationItem.leftBarButtonItem = self.editButtonItem
     }
+    
+    //뷰가 노출될 때마다 리시트의 데이터를 다시 불러옴
     override func viewWillAppear(_ animated: Bool) {
-        tvListView.reloadData()
+            tvListView.reloadData()
     }
-    // MARK: - Table view data source
+    
 
+    // MARK: - Table view data source
+    //테이블 안의 섹션 개수를 1로 설정함
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    //섹션당 열의 개수를 전달
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return items.count
     }
 
-    
+    //items와 itemsImageFile의 값을 셀에 삽입함
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath)
-        
+
         cell.textLabel?.text = items[(indexPath as NSIndexPath).row]
         cell.imageView?.image = UIImage(named: itemsImageFile[(indexPath as NSIndexPath).row])
-
-        // Configure the cell...
 
         return cell
     }
@@ -62,20 +57,23 @@ class TableViewController: UITableViewController {
 
     
     // Override to support editing the table view.
+    //목록 삭제 함수
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+        
+            // items와 itemsImageFile에서 해당 리스트를 삭제함
             items.remove(at: (indexPath as NSIndexPath).row)
             itemsImageFile.remove(at: (indexPath as NSIndexPath).row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    override func tableView(_ tableView: UITableView,titleForDeleteConfirmationButtonForRowAt
-                            indexPath: IndexPath) -> String?{
+    //삭제 시 Delete 대신 삭제 로 표시
+    override func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         return "삭제"
     }
+    
 
     
     // Override to support rearranging the table view.
@@ -85,7 +83,7 @@ class TableViewController: UITableViewController {
         items.remove(at: (fromIndexPath as NSIndexPath).row)
         itemsImageFile.remove(at: (fromIndexPath as NSIndexPath).row)
         items.insert(itemToMove, at: (to as NSIndexPath).row)
-        itemsImageFile.insert(itemToMove, at: (to as NSIndexPath).row)
+        itemsImageFile.insert(itemImageToMove, at: (to as NSIndexPath).row)
     }
     
 
@@ -101,16 +99,83 @@ class TableViewController: UITableViewController {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
+    //세그웨이를 이용하여 디테일 뷰로 전환하기
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "sgDetail"{
+        // Get the new view controller using segue.destination.
+        // Pass the selected object to the new view controller.
+        if segue.identifier == "sgDetail" {
             let cell = sender as! UITableViewCell
             let indexPath = self.tvListView.indexPath(for: cell)
             let detailView = segue.destination as! DetailViewController
-            detailView.receiveItem(items[((indexPath! as NSIndexPath).row)])
+            detailView.reciveItem(items[((indexPath! as NSIndexPath).row)])
         }
+    }
+    
+
+}
+
+*add view controller*
+import UIKit
+
+class AddViewController: UIViewController {
+
+    @IBOutlet var tfAddItem: UITextField!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+    }
+    //새 목록 
+    @IBAction func btnAddItem(_ sender: UIButton) {
+        items.append(tfAddItem.text!)
+        itemsImageFile.append("clock.png")
+        tfAddItem.text=""
+        _ = navigationController?.popViewController(animated: true)
+    }
+    
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
     }
+    */
+
+}
+*Detail View Controller*
+import UIKit
+
+class DetailViewController: UIViewController {
     
+    var receiveItem = ""
+
+    @IBOutlet var lblItem: UILabel!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+        lblItem.text = receiveItem
+    }
+    
+    //Main View에서 변수를 받아오기 위한 함수
+    func reciveItem(_ item: String)
+    {
+        receiveItem = item
+    }
+    
+
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destination.
+        // Pass the selected object to the new view controller.
+    }
+    */
 
 }
